@@ -47,11 +47,6 @@ const movieSchema = new mongoose.Schema(
         message: 'Некорректный URL',
       },
     },
-    owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-      required: true,
-    },
     movieId: {
       type: Number,
       required: [true, 'Поле "movieId" должно быть заполнено'],
@@ -63,6 +58,11 @@ const movieSchema = new mongoose.Schema(
     nameEN: {
       type: String,
       required: [true, 'Поле "nameEN" должно быть заполнено'],
+    },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
     },
   },
   { versionKey: false },
