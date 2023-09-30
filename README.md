@@ -2,6 +2,12 @@
 
 Express Api для приложения по поиску фильмов.
 
+## API URL
+
+```sh
+https://api.movies.krutopognali.nomoredomainsrocks.ru
+```
+
 ## Технологии
 
 - Express
