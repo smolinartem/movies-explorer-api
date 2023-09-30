@@ -4,6 +4,7 @@ const { Error } = require('mongoose');
 const Users = require('../models/user');
 const { NODE_ENV, JWT_SECRET } = require('../config');
 
+const { HTTP_STATUS_OK, HTTP_STATUS_CREATED, DUBLICATE_CODE } = require('../constants');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
 const NotFoundError = require('../errors/notFoundError');
@@ -13,11 +14,11 @@ const register = async (req, res, next) => {
     const { email, password, name } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await Users.create({ email, password: passwordHash, name });
-    res.status(201).send({ name: user.name, email: user.email });
+    res.status(HTTP_STATUS_CREATED).send({ name: user.name, email: user.email });
   } catch (err) {
     if (err instanceof Error.ValidationError) {
       next(new BadRequestError(err.message));
-    } else if (err.code === 11000) {
+    } else if (err.code === DUBLICATE_CODE) {
       next(new ConflictError('Данный email используется'));
     } else {
       next(err);
@@ -35,7 +36,7 @@ const login = async (req, res, next) => {
       { expiresIn: '7d' },
     );
     res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
-      .status(200).send({ message: 'Пользователь авторизировался' });
+      .status(HTTP_STATUS_OK).send({ message: 'Пользователь авторизировался' });
   } catch (err) {
     next(err);
   }
@@ -43,7 +44,7 @@ const login = async (req, res, next) => {
 
 const exit = (req, res, next) => {
   try {
-    res.clearCookie('jwt').send({ message: 'Осуществлён выход' });
+    res.clearCookie('jwt').status(HTTP_STATUS_OK).send({ message: 'Осуществлён выход' });
   } catch (err) {
     next(err);
   }
@@ -52,7 +53,7 @@ const exit = (req, res, next) => {
 const getUserInfo = async (req, res, next) => {
   try {
     const user = await Users.findById(req.user._id).orFail();
-    res.status(200).send({ user });
+    res.status(HTTP_STATUS_OK).send({ user });
   } catch (err) {
     if (err instanceof Error.DocumentNotFoundError) {
       next(new NotFoundError('Пользователь не найден'));
@@ -70,13 +71,13 @@ const updateUserInfo = async (req, res, next) => {
       { email, name },
       { new: true, runValidators: true },
     ).orFail();
-    res.status(200).send({ user });
+    res.status(HTTP_STATUS_OK).send({ user });
   } catch (err) {
     if (err instanceof Error.DocumentNotFoundError) {
       next(new NotFoundError('Пользователь не найден'));
     } else if (err instanceof Error.ValidationError) {
       next(new BadRequestError(err.message));
-    } else if (err.code === 11000) {
+    } else if (err.code === DUBLICATE_CODE) {
       next(new ConflictError('Данный email используется'));
     } else {
       next(err);
