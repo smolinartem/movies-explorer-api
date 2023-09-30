@@ -32,7 +32,7 @@ const login = async (req, res, next) => {
     const user = await Users.findUserByData(email, password);
     const token = jwt.sign(
       { _id: user._id },
-      NODE_ENV === 'production' ? JWT_SECRET : 'key-word',
+      NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
     res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
