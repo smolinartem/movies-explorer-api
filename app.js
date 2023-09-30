@@ -3,20 +3,18 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-
 const { errors } = require('celebrate');
+
 const { PORT, DB_URL } = require('./config');
 
+const router = require('./routes');
 const { register, login, exit } = require('./controllers/users');
+const { registerValidator, loginValidator } = require('./validations/validations');
+
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const error = require('./middlewares/error');
 const limiter = require('./middlewares/limiter');
-
-const userRouter = require('./routes/users');
-const movieRouter = require('./routes/movies');
-
-const { registerValidator, loginValidator } = require('./validations/validations');
 
 const connectToMongoDB = async (path) => {
   try {
@@ -34,7 +32,6 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(limiter);
-
 app.use(requestLogger);
 
 app.post('/signup', registerValidator, register);
@@ -42,9 +39,7 @@ app.post('/signin', loginValidator, login);
 app.post('/signout', exit);
 
 app.use(auth);
-
-app.use('/users', userRouter);
-app.use('/movies', movieRouter);
+app.use(router);
 
 app.use(errorLogger);
 app.use(errors());
