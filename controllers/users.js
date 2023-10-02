@@ -4,7 +4,9 @@ const { Error } = require('mongoose');
 const Users = require('../models/user');
 const { NODE_ENV, JWT_SECRET } = require('../config');
 
-const { HTTP_STATUS_OK, HTTP_STATUS_CREATED, DUBLICATE_CODE } = require('../constants');
+const {
+  HTTP_STATUS_OK, HTTP_STATUS_CREATED, DUBLICATE_CODE, MESSAGES,
+} = require('../constants');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
 const NotFoundError = require('../errors/notFoundError');
@@ -19,7 +21,7 @@ const register = async (req, res, next) => {
     if (err instanceof Error.ValidationError) {
       next(new BadRequestError(err.message));
     } else if (err.code === DUBLICATE_CODE) {
-      next(new ConflictError('Данный email используется'));
+      next(new ConflictError(MESSAGES.email_conflict));
     } else {
       next(err);
     }
@@ -36,7 +38,7 @@ const login = async (req, res, next) => {
       { expiresIn: '7d' },
     );
     res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
-      .status(HTTP_STATUS_OK).send({ message: 'Пользователь авторизировался' });
+      .status(HTTP_STATUS_OK).send({ message: MESSAGES.user_auth });
   } catch (err) {
     next(err);
   }
@@ -44,7 +46,7 @@ const login = async (req, res, next) => {
 
 const exit = (req, res, next) => {
   try {
-    res.clearCookie('jwt').status(HTTP_STATUS_OK).send({ message: 'Осуществлён выход' });
+    res.clearCookie('jwt').status(HTTP_STATUS_OK).send({ message: MESSAGES.user_exit });
   } catch (err) {
     next(err);
   }
@@ -56,7 +58,7 @@ const getUserInfo = async (req, res, next) => {
     res.status(HTTP_STATUS_OK).send({ user });
   } catch (err) {
     if (err instanceof Error.DocumentNotFoundError) {
-      next(new NotFoundError('Пользователь не найден'));
+      next(new NotFoundError(MESSAGES.user_notfound));
     } else {
       next(err);
     }
@@ -74,11 +76,11 @@ const updateUserInfo = async (req, res, next) => {
     res.status(HTTP_STATUS_OK).send({ user });
   } catch (err) {
     if (err instanceof Error.DocumentNotFoundError) {
-      next(new NotFoundError('Пользователь не найден'));
+      next(new NotFoundError(MESSAGES.user_notfound));
     } else if (err instanceof Error.ValidationError) {
       next(new BadRequestError(err.message));
     } else if (err.code === DUBLICATE_CODE) {
-      next(new ConflictError('Данный email используется'));
+      next(new ConflictError(MESSAGES.email_conflict));
     } else {
       next(err);
     }

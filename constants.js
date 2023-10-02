@@ -13,6 +13,16 @@ const DUBLICATE_CODE = 11000;
 
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\\+.~#?&\\/\\/=]*)/;
 
+const MESSAGES = {
+  email_conflict: 'Данный email используется',
+  user_auth: 'Пользователь авторизировался',
+  user_exit: 'Осуществлён выход',
+  user_notfound: 'Пользователь не найден',
+  movie_forbidden: 'Нельзя удалять фильмы других пользователей',
+  movie_delete: 'Фильм удалён',
+  movie_notfound: 'Фильм не найден',
+};
+
 module.exports = {
   HTTP_STATUS_OK,
   HTTP_STATUS_CREATED,
@@ -24,4 +34,5 @@ module.exports = {
   HTTP_STATUS_INTERNAL_SERVER_ERROR,
   DUBLICATE_CODE,
   URL_REGEX,
+  MESSAGES,
 };

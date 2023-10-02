@@ -1,7 +1,7 @@
 const { Error } = require('mongoose');
 const Movies = require('../models/movie');
 
-const { HTTP_STATUS_OK, HTTP_STATUS_CREATED } = require('../constants');
+const { HTTP_STATUS_OK, HTTP_STATUS_CREATED, MESSAGES } = require('../constants');
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
@@ -34,15 +34,15 @@ const deleteMovie = async (req, res, next) => {
   try {
     const movie = await Movies.findById(req.params._id).orFail();
     if (!movie.owner.equals(req.user._id)) {
-      throw new ForbiddenError('Нельзя удалять фильмы других пользователей');
+      throw new ForbiddenError(MESSAGES.movie_forbidden);
     }
-    movie.deleteOne();
-    res.status(HTTP_STATUS_OK).send({ message: 'Фильм удалён' });
+    await movie.deleteOne();
+    res.status(HTTP_STATUS_OK).send({ message: MESSAGES.movie_delete });
   } catch (err) {
     if (err instanceof Error.DocumentNotFoundError) {
-      next(new NotFoundError('Фильм не найден'));
+      next(new NotFoundError(MESSAGES.movie_notfound));
     } else if (err instanceof Error.CastError) {
-      next(new BadRequestError('Переданы некорректные данные'));
+      next(new BadRequestError(err.message));
     } else {
       next(err);
     }
