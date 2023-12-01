@@ -25,7 +25,19 @@ connectToMongoDB(DB_URL);
 
 const app = express();
 app.use(helmet());
-app.use(cors({ credentials: true }));
+
+app.use(
+  cors({
+    origin: [
+      'https://api.movies.krutopognali.nomoredomainsrocks.ru',
+      'http://api.movies.krutopognali.nomoredomainsrocks.ru',
+      'http://movies.krutopognali.nomoredomainsrocks.ru',
+      'https://movies.krutopognali.nomoredomainsrocks.ru',
+    ],
+    credentials: true,
+  }),
+);
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(limiter);

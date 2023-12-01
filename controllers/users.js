@@ -5,7 +5,10 @@ const Users = require('../models/user');
 const { NODE_ENV, JWT_SECRET } = require('../config');
 
 const {
-  HTTP_STATUS_OK, HTTP_STATUS_CREATED, DUBLICATE_CODE, MESSAGES,
+  HTTP_STATUS_OK,
+  HTTP_STATUS_CREATED,
+  DUBLICATE_CODE,
+  MESSAGES,
 } = require('../constants');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
@@ -16,7 +19,9 @@ const register = async (req, res, next) => {
     const { email, password, name } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await Users.create({ email, password: passwordHash, name });
-    res.status(HTTP_STATUS_CREATED).send({ name: user.name, email: user.email });
+    res
+      .status(HTTP_STATUS_CREATED)
+      .send({ name: user.name, email: user.email });
   } catch (err) {
     if (err instanceof Error.ValidationError) {
       next(new BadRequestError(err.message));
@@ -37,8 +42,10 @@ const login = async (req, res, next) => {
       NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
       { expiresIn: '7d' },
     );
-    res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
-      .status(HTTP_STATUS_OK).send({ message: MESSAGES.user_auth });
+    res
+      .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
+      .status(HTTP_STATUS_OK)
+      .send({ user });
   } catch (err) {
     next(err);
   }
@@ -46,7 +53,10 @@ const login = async (req, res, next) => {
 
 const exit = (req, res, next) => {
   try {
-    res.clearCookie('jwt').status(HTTP_STATUS_OK).send({ message: MESSAGES.user_exit });
+    res
+      .clearCookie('jwt')
+      .status(HTTP_STATUS_OK)
+      .send({ message: MESSAGES.user_exit });
   } catch (err) {
     next(err);
   }
@@ -88,5 +98,9 @@ const updateUserInfo = async (req, res, next) => {
 };
 
 module.exports = {
-  register, login, exit, getUserInfo, updateUserInfo,
+  register,
+  login,
+  exit,
+  getUserInfo,
+  updateUserInfo,
 };
